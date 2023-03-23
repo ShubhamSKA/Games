@@ -99,15 +99,6 @@ def initialization():
     while head.xcor()<-100:
         advance(length)
 
-def user_input():
-    if kbhit():
-        if ui!=getch:
-            ui=getch()
-            if ui in [b'w',b'a',b's',b'd'] and ui!=user_direction and user_direction!=invalid[ui]:
-                user_direction=ui
-                defined_direction=list(str(user_direction))[2]
-                direction_change(defined_direction)
-
 tails=[]
 
 game=0
@@ -139,7 +130,12 @@ while game!="end":
     if head.xcor()>=204 or head.xcor()<-204 or head.ycor()>=134 or head.ycor()<=-124:
         game='end'
 
-    user_input()   
+    if kbhit():
+        ui=getch()
+        if ui in [b'w',b'a',b's',b'd'] and ui!=user_direction and user_direction!=invalid[ui]:
+            user_direction=ui
+            defined_direction=list(str(user_direction))[2]
+            direction_change(defined_direction)   
 
     advance(length)
 
