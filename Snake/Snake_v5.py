@@ -13,7 +13,9 @@ def food_gen():
 
     x=(randint((-200/advancement),(200/advancement)))*advancement
     y=(randint((-120/advancement),(130/advancement)))*advancement
-    while getcolor(x,y)=='green': #making sure the food does not appear on the snake
+    canvas=getcanvas()
+    ids=canvas.find_overlapping(x,y,x,y)
+    while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
     
@@ -253,7 +255,9 @@ def special_pill():
     special.penup()
     x=(randint((-200/advancement),(200/advancement)))*advancement
     y=(randint((-120/advancement),(130/advancement)))*advancement
-    while getcolor(x,y)=='orange' or getcolor(x,y)=='green':
+    canvas=getcanvas()
+    ids=canvas.find_overlapping(x,y,x,y)
+    while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
 
@@ -339,7 +343,7 @@ screen=Screen()
 prev_time=0
 move_delay=20
 
-setup(450,340) #initial setup
+screen.setup(450,340,900,200) #initial setup
 head=Turtle()
 food=Turtle()
 draw=Turtle()
