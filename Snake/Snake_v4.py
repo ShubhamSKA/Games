@@ -117,6 +117,8 @@ def initialization():
     points.speed(0)
     timer.speed(0)
 
+    screen=Screen()
+    screen.tracer(False)
     points.penup()
     point_update(total)
     draw.penup()
@@ -126,7 +128,18 @@ def initialization():
     draw.goto(205,-125)
     draw.goto(-205,-125)
     draw.goto(-205,135) #create the borders
-
+    draw.penup()
+    draw.goto(-32,10)
+    square(20,'A')
+    draw.goto(-10,10)
+    square(20, 'S')
+    draw.goto(12,10)
+    square(20,'D')
+    draw.goto(-10,32)
+    square(20,'W')
+    draw.goto(-90,55)
+    draw.write("Go to terminal and type Y + Enter to start")
+    screen.tracer(True)
     head.penup()
     head.goto(-150,0)
     while head.xcor()<-100:
@@ -135,11 +148,12 @@ def initialization():
 def endgame(point):
     deco=Turtle()
     deco.ht()
-
+    screen=Screen()
     #list of acceptable colors
     colores=['deep pink','red','chartreuse','blue violet','magenta','spring green','blue','deep sky blue','pale green','medium violet red','violet','yellow','cyan','medium spring green','medium orchid']
     
     #animate dots
+    screen.tracer(False)
     for i in range(point):
         deco.penup()
         deco.speed(0)
@@ -148,9 +162,11 @@ def endgame(point):
         colour= i % len(colores)
         deco.setpos(x,y)
         deco.dot(5,colores[colour])
+        sleep(0.01)
+        screen.update()
+    screen.tracer(True)
     
     #animate the points
-    screen=Screen()
     points.color('green')
     points.goto(-300,-25) #establish starting point of points turtle
     x=-1*len(str(point))/2.0*(100/3.0) #establishe ending point of points turtle
@@ -168,14 +184,13 @@ def endgame(point):
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
         firework(x,y)
-#Function to animate a fireworks
+#Function to animate a firework
 def firework(x,y):
     screen=Screen()
-
+    screen.tracer(False)
     screen.colormode(255)
     fire=Turtle()
     fire.ht()
-    fire.speed(0)
 
     #list of colors in rgb
     colores=[(255,20,147),(255,0,0),(127,255,0),(138,43,226),(255,0,255),(0,255,127),(0,0,255),(0,191,255),(152,251,152),(199,21,133),(238,130,238),(255,255,0),(0,255,255),(0,250,154),(186,85,211)]
@@ -191,14 +206,17 @@ def firework(x,y):
         branch.forward(10)
         corners.append(branch) #creating a list of turtles that will represent each of the "trails"
 
-    screen.tracer(2)
     while colour!=(255,255,255): 
         for i in range(n):
             corners[i].clear()
             corners[i].forward(5)
             corners[i].dot(5,colour)
         colour=colorupdate(colour)
-        sleep(0.01) #move forward down the trail, towards white
+        sleep(0.01)
+        screen.update() #move forward down the trail, while fading towards white
+    for i in corners:
+        i.clear()
+    screen.tracer(True)
 #Function to fade a color
 def colorupdate(colour):
     r=colour[0]
@@ -245,6 +263,24 @@ def timer_setup():
         timer.forward(5)
         timer.stamp()
     screen.tracer(True)
+#Function to draw a square with a letter inside
+def square(side,letter):
+    x=draw.xcor()
+    y=draw.ycor()
+    draw.pendown()
+    draw.setheading(90)
+    draw.forward(side)
+    draw.setheading(0)
+    draw.forward(side)
+    draw.setheading(270)
+    draw.forward(side)
+    draw.setheading(180)
+    draw.forward(side)
+    draw.penup()
+    draw.goto(x+9*side/32,y+side/8)
+    draw.write(letter)
+
+
 
 ##NECESSARY VARIABLES
 tails=[] #list storing all the parts of the tail
@@ -281,6 +317,10 @@ while game!="start" and game!='end':
         game='end' 
 
 start_time=int(time()) #time at beginning of game
+screen.tracer(False)
+for i in range(52):
+    draw.undo()
+screen.tracer(True)
 
 while game!="end":
     if head.xcor()>=204 or head.xcor()<-204 or head.ycor()>=134 or head.ycor()<=-124:
@@ -340,5 +380,4 @@ while game!="end":
 
 clearscreen()
 endgame(total) #end of game animations
-
 screen.exitonclick()
