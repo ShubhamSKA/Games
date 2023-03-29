@@ -291,12 +291,21 @@ def square(side,letter):
     draw.goto(x+9*side/32,y+side/8)
     draw.write(letter)
     screen.tracer(True)
-#Function to calculate the highest score
+#Function to calculate the highest score ever on the computer
 def high_score():
-    with open('scores.txt') as data:
-        data2=data.read() #opening the file in readlines mode
-        data.closed #closing the file
-    data2=data2.split()
+    try:
+        with open('scores.txt') as data:
+            data2=data.read() #opening the file in read mode
+            data.closed #closing the file
+        data2=data2.split()
+    except:
+        with open('scores.txt','w') as file:
+            file.writelines("0\n")
+            file.closed
+        with open('scores.txt') as data:
+            data2=data.read() #opening the file in read mode
+            data.closed #closing the file
+        data2=data2.split()
     data3=[]
     for i in data2:
         data3.append(i+"\n")
