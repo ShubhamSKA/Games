@@ -8,7 +8,7 @@ from time import sleep, time
 from os import system
 #endregion
 
-##ALL FUNCTION DEFINITIONS
+###ALL FUNCTION DEFINITIONS
 #region
 #Function that defines where the food will appear, and draws it
 def food_gen():
@@ -352,10 +352,10 @@ def modeandstart():
     system('cls')
     screen=Screen()
     modeofgame=0
-    while modeofgame not in [1,2]:
+    while modeofgame not in [1,2,3]:
         try:
-            modeofgame=int(input("Select the game mode:\n1-Normal\n2-Mine\n"))
-            if modeofgame not in [1,2]:
+            modeofgame=int(input("Select the game mode:\n1-Normal\n2-Mine\n3-Walls\n"))
+            if modeofgame not in [1,2,3]:
                 print("That is not a valid game mode.")
         except:
             modeofgame=0
@@ -404,11 +404,30 @@ def mine_gen():
     screen.tracer(True)
 #Function to generate walls
 def wall_gen():
+    overlap=1
     screen=Screen()
+    canvas=getcanvas()
     screen.tracer(0)
     wall.penup()
     set_direction=90*(randint(0,3))
     wall.setheading(set_direction)
+    set_length=advancement*(randint(4,15))
+    while overlap!=0:
+        overlap=0
+        x=(randint((-200/advancement),(200/advancement)))*advancement
+        y=(randint((-120/advancement),(130/advancement)))*advancement
+        wall.goto(x,y)
+        for i in range(set_length):
+            wall.forward(1)
+            xcheck=wall.xcor()
+            ycheck=wall.ycor()
+            ids=canvas.find_overlapping(xcheck-1,ycheck-1,xcheck+1,ycheck+1)
+            overlap+=len(ids)
+    wall.goto(x,y)
+    wall.pendown()
+    wall.forward(set_length)
+    wall.penup()
+    screen.tracer(1)
 #Function to draw arrows
 def draw_arrow(direct):
     screen=Screen()
@@ -460,6 +479,8 @@ prev_time=0 #time at which the special pill will be produced
 move_delay=20 #variable to allow for an increase in speed
 mine_time=0 #time at which mine will be produced
 uis=[b'd'] #initial value of user inputs
+walls_time=0 #time at which wall will be produced
+food_eaten=0 #amount of normal food eaten at the given moment
 #endregion
 
 ##TURTLE SETUP
@@ -534,13 +555,15 @@ while game!="end":
         food_coor=food_gen()
         total+=4
         point_update(total)
+        food_eaten+=1
     
     current_time=int(time()-start_time) #timer at this turn 
     
     #SPECIAL PILL
     #region
-    if current_time % 30 == 15 and num_special==0: #create a special pill and its timer every 30 seconds
+    if current_time % 30 == 15 and num_special==0 and food_eaten>food_till+3: #create a special pill and its timer every 30 seconds
         start_pill_time=int(time()-start_time)
+        food_till=food_eaten
         screen.tracer(False)
         special_pill()
         num_special+=1
@@ -582,6 +605,9 @@ while game!="end":
     if gamemode==2 and current_time>mine_time:
         mine_time+=22
         mine_gen()
+    if gamemode==3 and current_time>walls_time:
+        walls_time+=45
+        wall_gen()
 
     if color_under=='green' or color_under=='black': #end game
         game='end'
@@ -592,8 +618,11 @@ while game!="end":
 filename='scores.txt'
 if gamemode==2:
     filename='mine_scores.txt'
+elif gamemode==3:
+    filename='wall_scores.txt'
 highest_score=high_score(filename)
 clearscreen()
 endgame(total,highest_score) #end of game animations
 screen.exitonclick()
+system('cls')
 #endregion
