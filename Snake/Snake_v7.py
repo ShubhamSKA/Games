@@ -144,16 +144,24 @@ def initialization():
     draw.goto(-205,-125)
     draw.goto(-205,135) #create the borders
     draw.penup()
-    draw.goto(-32,10)
+    draw.goto(-32-40,10)
     square(20,'A')
-    draw.goto(-10,10)
+    draw.goto(-10-40,10)
     square(20, 'S')
-    draw.goto(12,10)
+    draw.goto(12-40,10)
     square(20,'D')
-    draw.goto(-10,32)
+    draw.goto(-10-40,32)
     square(20,'W')
     draw.goto(-90,55)
-    draw.write("Go to terminal and type Y + Enter to start")
+    draw.write("Go to terminal and type in the mode to start")
+    draw.goto(10,10)
+    square(20,2)
+    draw.goto(32,10)
+    square(20,3)
+    draw.goto(54,10)
+    square(20,0)
+    draw.goto(32,32)
+    square(20,1)
     screen.tracer(True)
     head.penup()
     head.goto(-150,0)
@@ -286,8 +294,8 @@ def timer_setup():
         timer.forward(5)
         timer.stamp()
     screen.tracer(True)
-#Function to draw a square with a letter inside
-def square(side,letter):
+#Function to draw a square with a symbol inside
+def square(side,object):
     screen=Screen()
     screen.tracer(False)
     x=draw.xcor()
@@ -302,8 +310,12 @@ def square(side,letter):
     draw.setheading(180)
     draw.forward(side)
     draw.penup()
-    draw.goto(x+9*side/32,y+side/8)
-    draw.write(letter)
+    if type(object)==str:
+        draw.goto(x+9*side/32,y+side/8)
+        draw.write(object)
+    elif type(object)==int:
+        draw.goto(x+side/2,y+side/2)
+        draw_arrow(object)
     screen.tracer(True)
 #Function to calculate the highest score ever on the computer
 def high_score(filename):
@@ -397,6 +409,36 @@ def wall_gen():
     wall.penup()
     set_direction=90*(randint(0,3))
     wall.setheading(set_direction)
+#Function to draw arrows
+def draw_arrow(direct):
+    screen=Screen()
+    screen.tracer(0)
+    draw.setheading(90*direct)
+    draw.pendown()
+    draw.forward(8)
+    posit=draw.position()
+    draw.right(150)
+    draw.forward(4)
+    draw.goto(posit)
+    draw.setheading(90*direct)
+    draw.left(150)
+    draw.forward(4)
+    draw.goto(posit)
+    draw.penup()
+    screen.tracer(1)
+#Function to replace the stamp made by timer
+def timer_stamp():
+    screen=Screen()
+    screen.tracer(0)
+    timer.fillcolor('white')
+    timer.pencolor('white')
+    timer.pendown()
+    timer.begin_fill()
+    for i in range(4):
+        timer.forward(5)
+        timer.right(90)
+    timer.end_fill()
+    timer.penup()
 #endregion
 
 ##NECESSARY VARIABLES
@@ -442,12 +484,14 @@ game='start'
 
 start_time=int(time()) #time at beginning of game
 screen.tracer(False)
-for i in range(52):
+for i in range(143):
     draw.undo()
 screen.tracer(True)
 #endregion
 
-###GAME
+###############
+###GAME PLAY###
+###############
 #region
 while game!="end":
     if head.xcor()>=204 or head.xcor()<-204 or head.ycor()>=134 or head.ycor()<=-124:
@@ -501,13 +545,17 @@ while game!="end":
         special_pill()
         num_special+=1
         timer_setup()
+        timer.goto(timer.xcor()+2,timer.ycor()-2)
+        timer.isvisible()
         screen.tracer(True)
     if start_pill_time!=0:
+        screen.tracer(0)
         timer.color('white')
+        screen.tracer(1)
         if prev_time!=current_time-start_pill_time: #to assure it only updates once per second for 10 seconds
             screen.tracer(False)
             timer.setheading(180)
-            timer.stamp()
+            timer_stamp()
             timer.forward(5)
             screen.tracer(True) #erase a tenth of the timer
             prev_time=current_time-start_pill_time #update previous time for comparison
