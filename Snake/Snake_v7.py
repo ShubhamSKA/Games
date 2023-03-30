@@ -20,11 +20,11 @@ def food_gen():
     x=(randint((-200/advancement),(200/advancement)))*advancement
     y=(randint((-120/advancement),(130/advancement)))*advancement
     canvas=getcanvas()
-    ids=canvas.find_overlapping(x-2.5,y-2.5,x+2.5,y+2.5)
+    ids=canvas.find_overlapping(x-2.5,-(y+2.5),x+2.5,-(y-2.5))
     while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
-        ids=canvas.find_overlapping(x-2.5,y-2.5,x+2.5,y+2.5)
+        ids=canvas.find_overlapping(x-2.5,-(y+2.5),x+2.5,-(y-2.5))
     
     food.setpos(x,y)
     food.dot(5,"orange")
@@ -77,7 +77,6 @@ def point_update(point):
 #Function to advance the snake
 def advance(length,pause):
     screen=Screen()
-
     direction=head.heading()
     position=head.position()
 
@@ -274,11 +273,11 @@ def special_pill():
     x=(randint((-200/advancement),(200/advancement)))*advancement
     y=(randint((-120/advancement),(130/advancement)))*advancement
     canvas=getcanvas()
-    ids=canvas.find_overlapping(x-5,y-5,x+5,y+5)
+    ids=canvas.find_overlapping(x-5,-(y+5),x+5,-(y-5))
     while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
-        ids=canvas.find_overlapping(x-5,y-5,x+5,y+5)
+        ids=canvas.find_overlapping(x-5,-(y+5),x+5,-(y-5))
     special.setpos(x,y)
     special.dot(10,"red")
 
@@ -388,11 +387,11 @@ def mine_gen():
     x=(randint((-200/advancement),(200/advancement)))*advancement
     y=(randint((-120/advancement),(130/advancement)))*advancement
     canvas=getcanvas()
-    ids=canvas.find_overlapping(x-4,y-4,x+4,y+4)
+    ids=canvas.find_overlapping(x-4,-(y+4),x+4,-(y-4))
     while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
-        ids=canvas.find_overlapping(x-4,y-4,x+4,y+4)
+        ids=canvas.find_overlapping(x-4,-(y+4),x+4,-(y-4))
     mine.setpos(x,y)
     mine.dot(8,"black")
     for i in range(8):
@@ -421,7 +420,7 @@ def wall_gen():
             wall.forward(1)
             xcheck=wall.xcor()
             ycheck=wall.ycor()
-            ids=canvas.find_overlapping(xcheck-1,ycheck-1,xcheck+1,ycheck+1)
+            ids=canvas.find_overlapping(xcheck-1,-(ycheck+1),xcheck+1,-(ycheck-1))
             overlap+=len(ids)
     wall.goto(x,y)
     wall.pendown()
@@ -557,6 +556,7 @@ while game!="end":
         total+=4
         point_update(total)
         food_eaten+=1
+
     
     current_time=int(time()-start_time) #timer at this turn 
     
