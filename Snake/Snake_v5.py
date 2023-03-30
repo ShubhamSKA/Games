@@ -18,7 +18,7 @@ def food_gen():
     while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
-    
+        ids=canvas.find_overlapping(x,y,x,y)
     food.setpos(x,y)
     food.dot(5,"orange")
 
@@ -260,7 +260,7 @@ def special_pill():
     while (len(ids))!=0: #making sure the food does not appear on the snake or on pill
         x=(randint((-200/advancement),(200/advancement)))*advancement
         y=(randint((-120/advancement),(130/advancement)))*advancement
-
+        ids=canvas.find_overlapping(x,y,x,y)
     special.setpos(x,y)
     special.dot(10,"red")
 
