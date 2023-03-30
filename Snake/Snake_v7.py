@@ -481,6 +481,7 @@ mine_time=0 #time at which mine will be produced
 uis=[b'd'] #initial value of user inputs
 walls_time=0 #time at which wall will be produced
 food_eaten=0 #amount of normal food eaten at the given moment
+food_till=0 #amount of food eaten by the time the special pill appears
 #endregion
 
 ##TURTLE SETUP
@@ -603,10 +604,10 @@ while game!="end":
         screen.tracer(True)
         #endregion
     if gamemode==2 and current_time>mine_time:
-        mine_time+=22
+        mine_time+=22-int(food_eaten/4)
         mine_gen()
     if gamemode==3 and current_time>walls_time:
-        walls_time+=45
+        walls_time+=45-int(food_eaten/3)
         wall_gen()
 
     if color_under=='green' or color_under=='black': #end game
