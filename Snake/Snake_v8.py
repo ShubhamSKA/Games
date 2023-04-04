@@ -165,7 +165,7 @@ def initialization():
     while head.xcor()<-100:
         advance(length,move_delay)
 #Function to animate the ending
-def endgame(point,highscore):
+def endgame(point,highscore,user, global_highest):
     deco=Turtle()
     deco.ht()
     screen=Screen()
@@ -207,8 +207,18 @@ def endgame(point,highscore):
     
     screen.tracer(False)
     points.color('dark green')
-    points.goto(-85,-40)
-    points.write("HIGH SCORE: "+highscore, font=('Impact',18,'bold'))
+    points.goto(0,-40)
+    points.write(user.upper()+" HIGH SCORE: "+str(highscore), font=('Impact',18,'bold'), move=True)
+    length=points.xcor()
+    points.undo()
+    points.goto(-length/2,-40)
+    points.write(user.upper()+" HIGH SCORE: "+str(highscore), font=('Impact',18,'bold'))
+    points.goto(0,-60)
+    points.write("GLOBAL HIGH SCORE: "+str(global_highest), font=('Impact',18,'bold'),move=True)
+    length=points.xcor()
+    points.undo()
+    points.goto(-length/2,-60)
+    points.write("GLOBAL HIGH SCORE: "+str(global_highest), font=('Impact',18,'bold'),move=True)
     screen.tracer(True)
 #Function to animate a firework
 def firework(x,y):
@@ -314,36 +324,35 @@ def square(side,object):
         draw.goto(x+side/2,y+side/2)
         draw_arrow(object)
     screen.tracer(True)
-#Function to calculate the highest score ever on the computer
-def high_score(filename,user='visitor'):
-    try:
-        with open(filename) as data:
-            data2=data.read() #opening the file in read mode
-            data.closed #closing the file
-        data2=data2.split()
-    except:
-        with open(filename,'w') as file:
-            file.writelines("0\n")
-            file.closed
-        with open(filename) as data:
-            data2=data.read() #opening the file in read mode
-            data.closed #closing the file
-        data2=data2.split()
-    data3=[]
+#Function to calculate the highest score ever on the computer, as well as the highest score of the user
+def high_score(filename,score=0,user='visitor'):
+    with open(filename) as data:
+        data2=data.read() #opening the file in read mode
+        data.closed #closing the file
+    data2=data2.split("\n")
+    data2=data2[:-1]
+    data3={}
     for i in data2:
-        data3.append(i+"\n")
-    data3.append(str(total)+"\n")
-    with open(filename,'w') as file:
-        file.writelines(data3)
-        file.closed
-    with open(filename) as scores2:
-        scores=scores2.read()
-        scores2.closed
-    scores=scores.split()
-    int_scores=[]
-    for i in scores:
-        int_scores.append(int(i))
-    return(str(max(int_scores)))
+        i2=i.split(':')
+        data3[i2[0]]=int(i2[1])
+    if user not in data3:
+        data3[user]=score
+    if score>data3[user]:
+        high_score=score
+        data3[user]=high_score
+    else:
+        high_score=data3[user]
+    datakeys=list(data3.keys())
+    datavalues=list(data3.values())
+    ind=datakeys.index(user)
+    datakeys.append(datakeys.pop(ind))
+    datavalues.append(datavalues.pop(ind))
+    with open(filename, 'w') as file:
+        for i in datakeys:
+            file.writelines(i+':'+str(data3[i])+'\n')
+            file.closed
+    global_high_score=max(data3.values())
+    return(global_high_score,high_score)      
 #Function to get gameplay mode and start the game
 def modeandstart():
     global modeofgame
@@ -499,6 +508,32 @@ def mode_check(x,y):
             clickinstance=1
         else:
             modeofgame=0
+#Function to check which user is playing
+def check_user(letter):
+    global username
+    global attempt
+    if letter=='n':
+        username=screen.textinput("USERNAME","Enter username:")
+    else:
+        attempt+=1
+#Function to locate last user to play the game
+def get_last_user(filename):
+    try:
+        with open(filename) as data:
+            data2=data.read() #opening the file in read mode
+            data.closed #closing the file
+        data2=data2.split("\n")
+        data2=data2[:-1]
+        last_user=data2[-1].split(':')[0]
+    except:
+        with open(filename,'w') as file:
+            file.writelines("Visitor:0\n")
+            file.closed
+        with open(filename) as data:
+            data2=data.read()
+            data.closed
+        last_user=data2.split(':')[0]
+    return(last_user)     
 #endregion
 
 ##NECESSARY VARIABLES
@@ -525,6 +560,7 @@ food_eaten=0 #amount of normal food eaten at the given moment
 food_till=0 #amount of food eaten by the time the special pill appears
 clickinstance=0
 modeofgame=0
+attempt=0
 #endregion
 
 ##TURTLE SETUP
@@ -543,8 +579,8 @@ wall=Turtle()
 ##INITIALIZING
 #region
 initialization()
-food_coor=food_gen() #generating food
 modeandstart()
+food_coor=food_gen() #generating food
 game='start'
 
 start_time=int(time()) #time at beginning of game
@@ -651,14 +687,19 @@ while game!="end":
 
 ##END OF GAME
 #region
-filename='scores.txt'
+clearscreen()
+filename='normal_scores.txt'
 if modeofgame==2:
     filename='mine_scores.txt'
 elif modeofgame==3:
     filename='wall_scores.txt'
-highest_score=high_score(filename)
-clearscreen()
-endgame(total,highest_score) #end of game animations
+username=get_last_user(filename)
+letter=screen.textinput("USER","Are you user {}?(y,n)".format(username))
+check_user(letter)
+highest_scores=high_score(filename,total,username)
+highest_score=highest_scores[1]
+global_highest=highest_scores[0]
+endgame(total,highest_score,username, global_highest) #end of game animations
 screen.exitonclick()
 system('cls')
 #endregion
