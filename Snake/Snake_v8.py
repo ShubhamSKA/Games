@@ -26,7 +26,13 @@ def food_gen():
         ids=canvas.find_overlapping(x-2.5,-(y+2.5),x+2.5,-(y-2.5))
     
     food.setpos(x,y)
-    food.dot(5,"orange")
+    a=randint(0,100)
+    if a%20==0:
+        food.dot(5,"cyan")
+    elif a%50==0:
+        food.dot("purple")
+    else:
+        food.dot(5,"orange")
 
     screen.tracer(True)
     return(x,y)
@@ -50,20 +56,15 @@ def getcolor(x,y):
     y=-y #correcting for the change in coordinate system that will occur
     canvas=getcanvas()
     ids=canvas.find_overlapping(x,y,x,y) #locates the colors within the rectangle
-    
+    color='nocolor'
     if ids and len(ids)>=2:
         if len(ids)==3:
             if canvas.itemcget(ids[2],"fill")=='green':
-                return('green')
-        if canvas.itemcget(ids[0],"fill")=='black':
-            return('black')
-        if canvas.itemcget(ids[0],"fill")=='orange':
-            return('orange') 
-        if canvas.itemcget(ids[0],"fill")=='red':
-            return('red')
+                color='green'
+        else:
+            color=canvas.itemcget(ids[0],"fill")
         #returns the color, when relevant
-
-    return('nocolor')
+    return(color)
 #Function to update the point total on screen
 def point_update(point):
     screen=Screen()
@@ -619,15 +620,30 @@ while game!="end":
     advance(length,move_delay) #move snake
     move_delay+=0.3
     color_under=getcolor(head.xcor(),head.ycor()) #check what color is underneath the snake
-
-    if (head.position()==food_coor or color_under=='orange'): #check for food, and increase length if food is consumed
-        food.clear()
-        length+=2
+    screen.tracer(0)
+    if (color_under=='orange'): #check for food, and increase length if food is consumed
+        food.undo()
+        length+=4
         food_coor=food_gen()
         total+=4
         point_update(total)
         food_eaten+=1
-
+    elif(color_under=='cyan'):
+        food.undo()
+        food_coor=food_gen()
+        total+=50
+        point_update(total)
+        food_eaten+=1
+        move_delay+=10    
+    elif(color_under=='purple'):
+        food.undo()
+        food_coor=food_gen()
+        total+=70
+        point_update(total)
+        food_eaten+=1
+        move_delay/=5
+        length*=2
+    screen.tracer(1)
     
     current_time=int(time()-start_time) #timer at this turn 
     
@@ -667,7 +683,7 @@ while game!="end":
         special.clear()
         timer.clear()
         total+=10*(10-(current_time-start_pill_time))
-        length+=(10-(current_time-start_pill_time))
+        length+=(16-(current_time-start_pill_time))
         start_pill_time=0
         num_special=0
         point_update(total)
