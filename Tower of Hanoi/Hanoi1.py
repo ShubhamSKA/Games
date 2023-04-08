@@ -71,8 +71,8 @@ def move(array, possibilities, moveselect):
     post_move=[first,second,third]
     return post_move
     
-n=6 #number of disks on the tower - be careful when making the number too large, as it can cause the list to have an absurd amount of elements, slowing down python
-previous=[[list(range(n,0,-1)),[],[]]] #list of all previous moves -> need to optimize, as it can quickly get absurdly large
+n=5 #number of disks on the tower - be careful when making the number too large, as it can cause the list to have an absurd amount of elements, slowing down python
+previous=[[list(range(n,0,-1)),[],[]]]
 current=[list(range(n,0,-1)),[],[]] #current state of tower of hanoi
 steps=0
 
@@ -91,4 +91,6 @@ while current!=[[],[],list(range(n,0,-1))]:
         current=deepcopy(move(current , moves, 0))
     print_array(current,n)
     steps+=1
+    if len(previous)>1:
+        del previous[0]
     print("\nNumber of steps taken:", steps)   #will eventually take 3^n-1 steps
